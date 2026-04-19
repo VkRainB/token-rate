@@ -1,0 +1,42 @@
+{
+  "name": "tokenrate",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node ./script/build-end.js",
+    "preview": "vite preview",
+    "shadcn:init": "npx shadcn-vue@latest init"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.1.0",
+    "axios": "^1.13.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.19",
+    "eruda": "^3.4.3",
+    "lucide-vue-next": "^0.561.0",
+    "reka-ui": "^2.7.0",
+    "tailwind-merge": "^3.4.0",
+    "vue": "^3.5.25",
+    "vue-sonner": "^2.0.9"
+  },
+  "devDependencies": {
+    "@iconify-json/radix-icons": "^1.2.5",
+    "@iconify/vue": "^5.0.0",
+    "@types/node": "^24.10.4",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "autoprefixer": "^10.4.23",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.9.3",
+    "unplugin-auto-import": "^20.3.0",
+    "unplugin-vue-components": "^30.0.0",
+    "utools-api-types": "^7.2.0",
+    "vite": "^7.2.7",
+    "vite-plugin-pages": "^0.33.2",
+    "vite-plugin-use-modules": "^1.4.8",
+    "vue-router": "^4.6.3"
+  }
+}

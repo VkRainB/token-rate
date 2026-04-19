@@ -1,0 +1,192 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - generic [ref=e7]: 单价配置 (USD)
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]: IN
+          - text: 输入 / 1M
+        - generic [ref=e12]:
+          - spinbutton [ref=e13]: "5"
+          - generic: $
+        - generic [ref=e14]: ≈ ¥36.2500 / 1M
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: OT
+          - text: 输出 / 1M
+        - generic [ref=e18]:
+          - spinbutton [ref=e19]: "25"
+          - generic: $
+        - generic [ref=e20]: ≈ ¥181.2500 / 1M
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: CR
+          - text: 读取缓存 / 1M
+        - generic [ref=e24]:
+          - spinbutton [ref=e25]: "0.5"
+          - generic: $
+        - generic [ref=e26]: ≈ ¥3.6250 / 1M
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]: CW
+          - text: 写入缓存 / 1M
+        - generic [ref=e30]:
+          - spinbutton [ref=e31]: "6.25"
+          - generic: $
+        - generic [ref=e32]: ≈ ¥45.3125 / 1M
+    - separator [ref=e33]
+    - generic [ref=e34]:
+      - generic [ref=e35]: 汇率 1 USD =
+      - spinbutton [ref=e36]: "7.25"
+      - generic [ref=e37]: CNY
+    - separator [ref=e38]
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]: API 分组倍率
+        - button "展开 详细模式" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: 展开
+          - text: 详细模式
+      - generic [ref=e47]:
+        - generic [ref=e48]: 统一倍率
+        - spinbutton [ref=e49]: "1"
+        - generic [ref=e50]: 所有类型共用
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: 输入倍率
+          - spinbutton [ref=e55]: "1"
+          - generic [ref=e56]: 实际 $5.0000 / 1M
+        - generic [ref=e57]:
+          - generic [ref=e58]: 输出倍率
+          - spinbutton [ref=e59]: "1"
+          - generic [ref=e60]: 实际 $25.0000 / 1M
+        - generic [ref=e61]:
+          - generic [ref=e62]: 读取倍率
+          - spinbutton [ref=e63]: "1"
+          - generic [ref=e64]: 实际 $0.5000 / 1M
+        - generic [ref=e65]:
+          - generic [ref=e66]: 写入倍率
+          - spinbutton [ref=e67]: "1"
+          - generic [ref=e68]: 实际 $6.2500 / 1M
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]: 中转平台积分比例
+        - generic [ref=e72]:
+          - button "¥ CNY" [ref=e73] [cursor=pointer]
+          - button "$ USD" [ref=e74] [cursor=pointer]
+      - generic [ref=e75]:
+        - generic [ref=e76]: 充值
+        - spinbutton [ref=e77]: "10"
+        - generic [ref=e78]: CNY
+        - generic [ref=e79]: 得
+        - spinbutton [ref=e80]: "1000"
+        - generic [ref=e81]: 积分
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]: 1 积分 =
+          - generic [ref=e85]: ¥0.0100 / $0.0014
+        - generic [ref=e86]:
+          - generic [ref=e87]: 1 CNY =
+          - generic [ref=e88]: 100.00 积分
+        - generic [ref=e89]:
+          - generic [ref=e90]: 1 USD =
+          - generic [ref=e91]: 725.00 积分
+    - separator [ref=e92]
+    - generic [ref=e93]: 实际计算单价
+    - generic [ref=e94]:
+      - generic [ref=e95]:
+        - generic [ref=e96]: 输入单价
+        - generic [ref=e97]: $5.0000 / 1M
+        - generic [ref=e98]: ¥36.2500 / 1M
+        - generic [ref=e99]: 3625 积分 / 1M
+        - generic [ref=e100]: × 1.00 统一倍率
+      - generic [ref=e101]:
+        - generic [ref=e102]: 输出单价
+        - generic [ref=e103]: $25.0000 / 1M
+        - generic [ref=e104]: ¥181.2500 / 1M
+        - generic [ref=e105]: 18125 积分 / 1M
+        - generic [ref=e106]: × 1.00 统一倍率
+      - generic [ref=e107]:
+        - generic [ref=e108]: 读取单价
+        - generic [ref=e109]: $0.5000 / 1M
+        - generic [ref=e110]: ¥3.6250 / 1M
+        - generic [ref=e111]: 363 积分 / 1M
+        - generic [ref=e112]: × 1.00 统一倍率
+      - generic [ref=e113]:
+        - generic [ref=e114]: 写入单价
+        - generic [ref=e115]: $6.2500 / 1M
+        - generic [ref=e116]: ¥45.3125 / 1M
+        - generic [ref=e117]: 4531 积分 / 1M
+        - generic [ref=e118]: × 1.00 统一倍率
+  - generic [ref=e119]:
+    - generic [ref=e120]: 实际消耗 Token 测试
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]: IN
+        - text: 输入 (Input Tokens)
+      - spinbutton [ref=e124]: "37"
+    - generic [ref=e125]:
+      - generic [ref=e126]:
+        - generic [ref=e127]: OT
+        - text: 输出 (Output Tokens)
+      - spinbutton [ref=e128]: "916"
+    - generic [ref=e129]:
+      - generic [ref=e130]:
+        - generic [ref=e131]: CR
+        - text: 缓存读取 (Cache Read)
+      - spinbutton [ref=e132]: "72801"
+    - generic [ref=e133]:
+      - generic [ref=e134]:
+        - generic [ref=e135]: CW
+        - text: 缓存写入 (Cache Write)
+      - spinbutton [ref=e136]: "1368"
+    - separator [ref=e137]
+    - generic [ref=e138]: 费用账单明细
+    - generic [ref=e139]:
+      - generic [ref=e140]: USD $
+      - generic [ref=e141]: CNY ¥
+      - generic [ref=e142]: 积分
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - generic [ref=e146]: IN
+          - text: 输入
+        - generic [ref=e147]:
+          - generic [ref=e148]: $0.000185
+          - generic [ref=e149]: ¥0.001341
+          - generic [ref=e150]: 0.13 积分
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e153]: OT
+          - text: 输出
+        - generic [ref=e154]:
+          - generic [ref=e155]: $0.022900
+          - generic [ref=e156]: ¥0.166025
+          - generic [ref=e157]: 16.60 积分
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - generic [ref=e160]: CR
+          - text: 读取
+        - generic [ref=e161]:
+          - generic [ref=e162]: $0.036401
+          - generic [ref=e163]: ¥0.263904
+          - generic [ref=e164]: 26.39 积分
+      - generic [ref=e165]:
+        - generic [ref=e166]:
+          - generic [ref=e167]: CW
+          - text: 写入
+        - generic [ref=e168]:
+          - generic [ref=e169]: $0.008550
+          - generic [ref=e170]: ¥0.061988
+          - generic [ref=e171]: 6.20 积分
+    - separator [ref=e173]
+    - generic [ref=e174]:
+      - generic [ref=e175]: 总计估算
+      - generic [ref=e176]:
+        - generic [ref=e177]: $0.068035
+        - generic [ref=e178]: ¥0.493257
+        - generic [ref=e179]: 49.33 积分
+    - generic [ref=e180]:
+      - generic [ref=e181]:
+        - generic [ref=e182]: 命中缓存为您节省
+        - generic [ref=e183]: 82.8%
+      - generic [ref=e186]: 由于启用了 Context Caching，共节省了 $0.327605 (约 ¥2.375133)

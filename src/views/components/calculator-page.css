@@ -1,0 +1,1083 @@
+.calculator-page {
+  --apple-bg: #f2f2f7;
+  --apple-card: rgba(255, 255, 255, 0.78);
+  --apple-card-border: rgba(255, 255, 255, 0.45);
+  --apple-text-main: #1c1c1e;
+  --apple-text-mut: #8e8e93;
+  --apple-text-light: #aeaeb2;
+  --apple-input-bg: rgba(118, 118, 128, 0.1);
+  --apple-divider: rgba(60, 60, 67, 0.1);
+  --apple-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --sys-blue: #007aff;
+  --sys-orange: #ff9500;
+  --sys-green: #34c759;
+  --sys-purple: #af52de;
+  --sys-cyan: #32ade6;
+  --apple-radius-xl: 24px;
+  --apple-radius-lg: 16px;
+  --apple-radius-md: 10px;
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: var(--apple-bg);
+  color: var(--apple-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark .calculator-page {
+  --apple-bg: #000000;
+  --apple-card: rgba(28, 28, 30, 0.7);
+  --apple-card-border: rgba(255, 255, 255, 0.1);
+  --apple-text-main: #f2f2f7;
+  --apple-text-mut: #98989d;
+  --apple-text-light: #636366;
+  --apple-input-bg: rgba(118, 118, 128, 0.22);
+  --apple-divider: rgba(84, 84, 88, 0.3);
+  --apple-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --sys-blue: #0a84ff;
+  --sys-orange: #ff9f0a;
+  --sys-green: #30d158;
+  --sys-purple: #bf5af2;
+  --sys-cyan: #64d2ff;
+}
+
+.calculator-page * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.calculator-page .ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.calculator-page .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: float 20s infinite alternate ease-in-out;
+}
+
+.calculator-page .blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: var(--sys-blue);
+}
+
+.calculator-page .blob-2 {
+  right: -10%;
+  bottom: -10%;
+  width: 60vw;
+  height: 60vw;
+  background: var(--sys-purple);
+  animation-delay: -5s;
+}
+
+.calculator-page .blob-3 {
+  top: 40%;
+  left: 60%;
+  width: 40vw;
+  height: 40vw;
+  background: var(--sys-orange);
+  animation-delay: -10s;
+  opacity: 0.28;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(5%, 10%) scale(1.1);
+  }
+}
+
+.calculator-page .root {
+  position: relative;
+  z-index: 1;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 22px 18px;
+}
+
+.calculator-page .grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.calculator-page .card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--apple-card-border);
+  border-radius: var(--apple-radius-xl);
+  background: var(--apple-card);
+  box-shadow: var(--apple-shadow);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+.calculator-page .panel-section {
+  padding: 14px;
+  border-radius: var(--apple-radius-lg);
+  background: var(--apple-input-bg);
+}
+
+.calculator-page .left-control-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.calculator-page .section-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.calculator-page .sec-title {
+  color: var(--apple-text-mut);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.calculator-page .icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.calculator-page .bg-blue {
+  background: var(--sys-blue);
+}
+
+.calculator-page .bg-orange {
+  background: var(--sys-orange);
+}
+
+.calculator-page .bg-green {
+  background: var(--sys-green);
+}
+
+.calculator-page .bg-purple {
+  background: var(--sys-purple);
+}
+
+.calculator-page .price-grid,
+.calculator-page .rate-grid,
+.calculator-page .token-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.calculator-page .price-item,
+.calculator-page .field,
+.calculator-page .gd-item,
+.calculator-page .derived-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calculator-page .field label,
+.calculator-page .price-item label,
+.calculator-page .group-simple-row label,
+.calculator-page .gd-item label,
+.calculator-page .result-label,
+.calculator-page .recharge-row label,
+.calculator-page .ex-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--apple-text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.calculator-page .gd-item label {
+  color: var(--apple-text-mut);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.calculator-page input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--apple-radius-md);
+  background: rgba(255, 255, 255, 0.32);
+  color: var(--apple-text-main);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.2s var(--ease-apple);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.calculator-page input[type="number"]::-webkit-outer-spin-button,
+.calculator-page input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dark .calculator-page input[type="number"] {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.calculator-page input[type="number"]:focus {
+  outline: none;
+  background: transparent;
+  border-color: var(--sys-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
+}
+
+.calculator-page .price-input-wrap {
+  position: relative;
+}
+
+.calculator-page .price-input-wrap input {
+  padding-right: 34px;
+}
+
+.calculator-page .price-unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--apple-text-mut);
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.calculator-page .ref-row,
+.calculator-page .gd-effective {
+  color: var(--apple-text-mut);
+  font-size: 11px;
+}
+
+.calculator-page .gd-effective {
+  color: var(--sys-cyan);
+}
+
+.calculator-page .ex-note,
+.calculator-page .unit {
+  color: var(--apple-text-mut);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.calculator-page .group-switch-area {
+  min-height: 60px;
+}
+
+.calculator-page .group-simple-row {
+  gap: 10px;
+}
+
+.calculator-page .group-simple-row input {
+  width: 92px;
+}
+
+.calculator-page .hint {
+  color: var(--apple-text-mut);
+  font-size: 12px;
+}
+
+.calculator-page .group-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.calculator-page .toggle-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--sys-blue);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: all 0.2s var(--ease-apple);
+}
+
+.dark .calculator-page .toggle-detail-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.calculator-page .toggle-detail-btn.on {
+  background: var(--sys-blue);
+  color: #fff;
+}
+
+.calculator-page .currency-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.14);
+}
+
+.calculator-page .currency-toggle button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--apple-text-mut);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calculator-page .currency-toggle button.active {
+  background: var(--apple-bg);
+  color: var(--apple-text-main);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.calculator-page .recharge-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.calculator-page .recharge-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calculator-page .exchange-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calculator-page .exchange-inline-label {
+  color: var(--apple-text-mut);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calculator-page .exchange-inline input {
+  width: 72px;
+  min-width: 72px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.calculator-page .recharge-layout {
+  display: flex;
+  width: 100%;
+  justify-content: stretch;
+}
+
+.calculator-page .recharge-side {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.calculator-page .recharge-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 92px) auto auto minmax(0, 92px) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.calculator-page .recharge-get-label {
+  margin-left: 4px;
+}
+
+.calculator-page .derived-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--apple-divider);
+  width: 100%;
+}
+
+.calculator-page .d-label {
+  color: var(--apple-text-mut);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calculator-page .d-val {
+  color: var(--sys-cyan);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.calculator-page .rate-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.26);
+  overflow: hidden;
+}
+
+.dark .calculator-page .rate-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.calculator-page .rate-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.calculator-page .rate-item.border-blue::before {
+  background: var(--sys-blue);
+}
+
+.calculator-page .rate-item.border-orange::before {
+  background: var(--sys-orange);
+}
+
+.calculator-page .rate-item.border-green::before {
+  background: var(--sys-green);
+}
+
+.calculator-page .rate-item.border-purple::before {
+  background: var(--sys-purple);
+}
+
+.calculator-page .rate-label {
+  color: var(--apple-text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calculator-page .rate-usd {
+  color: var(--apple-text-main);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.calculator-page .rate-unit-inline,
+.calculator-page .rate-cny,
+.calculator-page .rate-mult {
+  color: var(--apple-text-mut);
+  font-size: 11px;
+}
+
+.calculator-page .rate-pts {
+  color: var(--sys-cyan);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.calculator-page .bill-headline {
+  align-items: flex-end;
+}
+
+.calculator-page .cols-header {
+  display: flex;
+  gap: 14px;
+  color: var(--apple-text-light);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calculator-page .cols-usd {
+  min-width: 74px;
+  text-align: right;
+}
+
+.calculator-page .cols-cny {
+  min-width: 58px;
+  text-align: right;
+}
+
+.calculator-page .cols-pts {
+  min-width: 64px;
+  text-align: right;
+}
+
+.calculator-page .result-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.calculator-page .result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--apple-divider);
+}
+
+.calculator-page .result-row:last-child {
+  border-bottom: none;
+}
+
+.calculator-page .result-vals {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.calculator-page .r-usd {
+  min-width: 74px;
+  color: var(--apple-text-main);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.calculator-page .r-cny {
+  min-width: 58px;
+  color: var(--apple-text-mut);
+  font-size: 11px;
+  text-align: right;
+}
+
+.calculator-page .r-pts {
+  min-width: 64px;
+  color: var(--sys-cyan);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.calculator-page .panel-section-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calculator-page .total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calculator-page .total-label {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.calculator-page .total-vals {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.calculator-page .total-usd {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.calculator-page .total-cny,
+.calculator-page .total-pts {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calculator-page .total-cny {
+  color: var(--apple-text-mut);
+}
+
+.calculator-page .total-pts {
+  color: var(--sys-cyan);
+}
+
+.calculator-page .savings-bar {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.dark .calculator-page .savings-bar {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.calculator-page .savings-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.calculator-page .savings-percent {
+  color: var(--sys-green);
+}
+
+.calculator-page .bar-wrap {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.dark .calculator-page .bar-wrap {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.calculator-page .bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sys-cyan), var(--sys-green));
+  transition: width 0.5s var(--ease-apple);
+}
+
+.calculator-page .savings-note {
+  margin-top: 8px;
+  color: var(--sys-green);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 920px) and (max-height: 640px) {
+  .calculator-page {
+    font-size: 13px;
+  }
+
+  .calculator-page .blob {
+    filter: blur(52px);
+    opacity: 0.24;
+  }
+
+  .calculator-page .root {
+    max-width: 890px;
+    padding: 10px 10px 8px;
+  }
+
+  .calculator-page .grid {
+    gap: 10px;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  }
+
+  .calculator-page .card {
+    gap: 10px;
+    padding: 9px;
+    border-radius: 20px;
+  }
+
+  .calculator-page .left-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    align-items: start;
+  }
+
+  .calculator-page .left-card > .panel-section-price {
+    grid-column: 1;
+  }
+
+  .calculator-page .left-card > .left-control-grid {
+    grid-column: 2;
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-page .left-card > .panel-section-recharge {
+    grid-column: 1 / -1;
+  }
+
+  .calculator-page .left-card > .panel-section-rates {
+    grid-column: 1 / -1;
+  }
+
+  .calculator-page .panel-section {
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .calculator-page .left-control-grid {
+    gap: 10px;
+  }
+
+  .calculator-page .section-topline {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .calculator-page .sec-title {
+    font-size: 10px;
+  }
+
+  .calculator-page .icon-box {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+
+  .calculator-page .field label,
+  .calculator-page .price-item label,
+  .calculator-page .group-simple-row label,
+  .calculator-page .gd-item label,
+  .calculator-page .result-label,
+  .calculator-page .recharge-row label,
+  .calculator-page .ex-row label {
+    font-size: 12px;
+  }
+
+  .calculator-page .price-grid,
+  .calculator-page .rate-grid,
+  .calculator-page .token-grid {
+    gap: 6px;
+  }
+
+  .calculator-page .token-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .calculator-page .price-item,
+  .calculator-page .field,
+  .calculator-page .gd-item,
+  .calculator-page .derived-item {
+    gap: 4px;
+  }
+
+  .calculator-page input[type="number"] {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+
+  .calculator-page .price-unit,
+  .calculator-page .ex-note,
+  .calculator-page .unit {
+    font-size: 11px;
+  }
+
+  .calculator-page .inline-ex-row input {
+    width: 72px;
+  }
+
+  .calculator-page .group-simple-row input {
+    width: 74px;
+  }
+
+  .calculator-page .hint,
+  .calculator-page .ref-row,
+  .calculator-page .gd-effective,
+  .calculator-page .rate-unit-inline,
+  .calculator-page .rate-cny,
+  .calculator-page .rate-mult,
+  .calculator-page .cols-header,
+  .calculator-page .d-label {
+    font-size: 10px;
+  }
+
+  .calculator-page .recharge-layout {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .calculator-page .recharge-side {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .calculator-page .recharge-heading {
+    gap: 8px;
+  }
+
+  .calculator-page .recharge-toolbar {
+    gap: 6px;
+  }
+
+  .calculator-page .recharge-row {
+    grid-template-columns: auto minmax(0, 72px) auto auto minmax(0, 72px) auto;
+    gap: 6px;
+  }
+
+  .calculator-page .derived-row {
+    gap: 6px;
+    margin-top: 6px;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .calculator-page .d-val {
+    font-size: 10px;
+  }
+
+  .calculator-page .currency-toggle button {
+    padding: 4px 8px;
+  }
+
+  .calculator-page .toggle-detail-btn {
+    padding: 3px 8px;
+    font-size: 9px;
+  }
+
+  .calculator-page .exchange-inline {
+    gap: 4px;
+  }
+
+  .calculator-page .exchange-inline-label {
+    font-size: 10px;
+  }
+
+  .calculator-page .exchange-inline input {
+    width: 60px;
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .calculator-page .rate-item {
+    gap: 2px;
+    padding: 8px 8px 8px 10px;
+  }
+
+  .calculator-page .rate-label {
+    font-size: 10px;
+  }
+
+  .calculator-page .rate-usd {
+    font-size: 13px;
+  }
+
+  .calculator-page .panel-section-rates .rate-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .calculator-page .panel-section-rates .rate-mult {
+    display: none;
+  }
+
+  .calculator-page .panel-section-rates .rate-cny,
+  .calculator-page .panel-section-rates .rate-pts {
+    font-size: 9px;
+  }
+
+  .calculator-page .bill-headline {
+    gap: 8px;
+  }
+
+  .calculator-page .cols-header {
+    gap: 10px;
+  }
+
+  .calculator-page .cols-usd {
+    min-width: 60px;
+  }
+
+  .calculator-page .cols-cny {
+    min-width: 48px;
+  }
+
+  .calculator-page .cols-pts {
+    min-width: 52px;
+  }
+
+  .calculator-page .result-row {
+    gap: 8px;
+    padding: 6px 0;
+  }
+
+  .calculator-page .result-vals {
+    gap: 10px;
+  }
+
+  .calculator-page .r-usd {
+    min-width: 60px;
+    font-size: 12px;
+  }
+
+  .calculator-page .r-cny {
+    min-width: 48px;
+    font-size: 10px;
+  }
+
+  .calculator-page .r-pts {
+    min-width: 52px;
+    font-size: 10px;
+  }
+
+  .calculator-page .total-label {
+    font-size: 13px;
+  }
+
+  .calculator-page .total-vals {
+    gap: 10px;
+  }
+
+  .calculator-page .total-usd {
+    font-size: 18px;
+  }
+
+  .calculator-page .total-cny,
+  .calculator-page .total-pts,
+  .calculator-page .savings-label,
+  .calculator-page .savings-note {
+    font-size: 10px;
+  }
+
+  .calculator-page .savings-bar {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calculator-page {
+    overflow: auto;
+  }
+
+  .calculator-page .root {
+    padding: 14px 12px;
+  }
+
+  .calculator-page .grid,
+  .calculator-page .left-control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-page .token-grid,
+  .calculator-page .price-grid,
+  .calculator-page .rate-grid,
+  .calculator-page .group-detail-grid,
+  .calculator-page .derived-row {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-page .bill-headline,
+  .calculator-page .section-topline,
+  .calculator-page .total-row,
+  .calculator-page .savings-label {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .calculator-page .recharge-layout,
+  .calculator-page .recharge-side {
+    justify-content: stretch;
+    align-items: flex-start;
+  }
+
+  .calculator-page .recharge-heading {
+    flex-wrap: wrap;
+  }
+
+  .calculator-page .recharge-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .calculator-page .recharge-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .calculator-page .recharge-get-label {
+    margin-left: 0;
+  }
+
+  .calculator-page .total-vals {
+    flex-wrap: wrap;
+  }
+}
+
+.calculator-page .current-model-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 10px;
+  margin: 4px 0 10px;
+  background: rgba(0, 122, 255, 0.12);
+  color: var(--sys-blue);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  max-width: 100%;
+}
+
+.dark .calculator-page .current-model-chip {
+  background: rgba(10, 132, 255, 0.2);
+}
+
+.calculator-page .current-model-chip .cmc-label {
+  font-weight: 600;
+  opacity: 0.75;
+  width: 40px;
+}
+
+.calculator-page .current-model-chip .cmc-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+.calculator-page .current-model-chip .cmc-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-apple);
+}
+
+.calculator-page .current-model-chip .cmc-close:hover {
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.calculator-page .current-model-chip .cmc-icon {
+  width: 12px;
+  height: 12px;
+}

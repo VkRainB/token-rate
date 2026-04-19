@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -f \"auto-imports.d.ts\" ])",
+      "Bash(then echo \"auto-imports.d.ts exists\")",
+      "Bash(fi)",
+      "Bash(if [ -f \"components.d.ts\" ])",
+      "Bash(then echo \"components.d.ts exists\")",
+      "WebFetch(domain:www.u-tools.cn)",
+      "Bash(dir:*)",
+      "Bash(npm run build)"
+    ]
+  }
+}

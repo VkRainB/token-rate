@@ -1,0 +1,16 @@
+{
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "development": {
+    "main": "http://localhost:3001"
+  },
+  "features": [
+    {
+      "code": "basic",
+      "explain": "Token 计费计算器：输入/输出/缓存倍率与美元、人民币、积分换算",
+      "cmds": ["token", "积分"],
+      "icon": "logo.png"
+    }
+  ]
+}

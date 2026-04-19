@@ -1,0 +1,2269 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <title>Model Billing Calculator</title>
+        <style>
+            :root {
+                /* Light Mode Variables */
+                --apple-bg: #f2f2f7;
+                --apple-card: rgba(255, 255, 255, 0.75);
+                --apple-card-border: rgba(255, 255, 255, 0.4);
+                --apple-text-main: #1c1c1e;
+                --apple-text-mut: #8e8e93;
+                --apple-text-light: #aeaeb2;
+                --apple-input-bg: rgba(118, 118, 128, 0.12);
+                --apple-divider: rgba(60, 60, 67, 0.1);
+                --apple-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+                /* System Colors */
+                --sys-blue: #007aff;
+                --sys-orange: #ff9500;
+                --sys-green: #34c759;
+                --sys-purple: #af52de;
+                --sys-cyan: #32ade6;
+
+                --apple-radius-xl: 24px;
+                --apple-radius-lg: 16px;
+                --apple-radius-md: 10px;
+                --apple-radius-sm: 8px;
+                --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+                --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            /* Dark Mode Auto-Switch */
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --apple-bg: #000000;
+                    --apple-card: rgba(28, 28, 30, 0.65);
+                    --apple-card-border: rgba(255, 255, 255, 0.1);
+                    --apple-text-main: #f2f2f7;
+                    --apple-text-mut: #98989d;
+                    --apple-text-light: #636366;
+                    --apple-input-bg: rgba(118, 118, 128, 0.24);
+                    --apple-divider: rgba(84, 84, 88, 0.3);
+                    --apple-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+                    --sys-blue: #0a84ff;
+                    --sys-orange: #ff9f0a;
+                    --sys-green: #30d158;
+                    --sys-purple: #bf5af2;
+                    --sys-cyan: #64d2ff;
+                }
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                color: var(--apple-text-main);
+                background-color: var(--apple-bg);
+                -webkit-font-smoothing: antialiased;
+                line-height: 1.5;
+                position: relative;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* Ambient Background Blobs for Glassmorphism */
+            .ambient-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                overflow: hidden;
+                pointer-events: none;
+            }
+            .blob {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.4;
+                animation: float 20s infinite alternate ease-in-out;
+            }
+            .blob-1 {
+                top: -10%;
+                left: -10%;
+                width: 50vw;
+                height: 50vw;
+                background: var(--sys-blue);
+            }
+            .blob-2 {
+                bottom: -10%;
+                right: -10%;
+                width: 60vw;
+                height: 60vw;
+                background: var(--sys-purple);
+                animation-delay: -5s;
+            }
+            .blob-3 {
+                top: 40%;
+                left: 60%;
+                width: 40vw;
+                height: 40vw;
+                background: var(--sys-orange);
+                animation-delay: -10s;
+                opacity: 0.3;
+            }
+            @keyframes float {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    transform: translate(5%, 10%) scale(1.1);
+                }
+            }
+
+            .root {
+                padding: 40px 20px;
+                max-width: 1000px;
+                margin: 0 auto;
+                z-index: 1;
+                position: relative;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                gap: 24px;
+            }
+
+            /* Glassmorphism Card */
+            .card {
+                background: var(--apple-card);
+                border: 1px solid var(--apple-card-border);
+                border-radius: var(--apple-radius-xl);
+                padding: 28px;
+                box-shadow: var(--apple-shadow);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                transition:
+                    transform 0.3s var(--ease-apple),
+                    box-shadow 0.3s var(--ease-apple);
+            }
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            }
+
+            .sec-title {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--apple-text-mut);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 20px;
+            }
+
+            /* Color Icons */
+            .icon-box {
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 12px;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+            .bg-blue {
+                background: var(--sys-blue);
+            }
+            .bg-orange {
+                background: var(--sys-orange);
+            }
+            .bg-green {
+                background: var(--sys-green);
+            }
+            .bg-purple {
+                background: var(--sys-purple);
+            }
+
+            .field {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+            .field label,
+            .price-item label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--apple-text-main);
+            }
+
+            /* Inputs */
+            input[type="number"] {
+                width: 100%;
+                padding: 12px 14px;
+                font-size: 15px;
+                font-weight: 500;
+                font-family: inherit;
+                border: 1px solid transparent;
+                border-radius: var(--apple-radius-md);
+                background: var(--apple-input-bg);
+                color: var(--apple-text-main);
+                transition: all 0.2s var(--ease-apple);
+                font-variant-numeric: tabular-nums;
+            }
+            input[type="number"]:focus {
+                outline: none;
+                background: transparent;
+                border-color: var(--sys-blue);
+                box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+            }
+
+            .divider {
+                border: none;
+                border-top: 1px solid var(--apple-divider);
+                margin: 28px 0;
+            }
+
+            /* Price Grid */
+            .price-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px 16px;
+            }
+            .price-item {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .price-input-wrap {
+                position: relative;
+            }
+            .price-input-wrap input {
+                padding-right: 36px;
+            }
+            .price-unit {
+                position: absolute;
+                right: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 15px;
+                color: var(--apple-text-mut);
+                pointer-events: none;
+                font-weight: 500;
+            }
+            .ref-row {
+                font-size: 12px;
+                color: var(--apple-text-mut);
+                margin-top: 2px;
+            }
+
+            /* Group Rate Box */
+            .group-rate-box {
+                background: var(--apple-input-bg);
+                border-radius: var(--apple-radius-lg);
+                overflow: hidden;
+                margin-bottom: 16px;
+            }
+            .group-rate-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 18px;
+                border-bottom: 1px solid var(--apple-divider);
+            }
+            .group-rate-header-left {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--apple-text-main);
+            }
+
+            /* Vivid Toggle Button */
+            .toggle-detail-btn {
+                font-size: 12px;
+                font-weight: 600;
+                padding: 6px 14px;
+                border: none;
+                border-radius: 100px;
+                background: var(--apple-card);
+                color: var(--sys-blue);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                cursor: pointer;
+                transition: all 0.2s var(--ease-apple);
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .toggle-detail-btn:hover {
+                transform: scale(1.03);
+            }
+            .toggle-detail-btn.on {
+                background: var(--sys-blue);
+                color: #fff;
+            }
+
+            /* Smooth Reveal */
+            .group-anim-wrap {
+                display: grid;
+                transition: grid-template-rows 0.4s var(--ease-spring);
+            }
+            .group-simple-wrap {
+                grid-template-rows: 1fr;
+            }
+            .group-simple-wrap.hidden {
+                grid-template-rows: 0fr;
+            }
+            .group-detail-wrap {
+                grid-template-rows: 0fr;
+            }
+            .group-detail-wrap.visible {
+                grid-template-rows: 1fr;
+            }
+            .anim-inner {
+                overflow: hidden;
+            }
+
+            .group-simple,
+            .group-detail {
+                padding: 16px 18px;
+            }
+            .group-simple input {
+                width: 110px;
+            }
+            .group-simple-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .group-simple-row label {
+                font-size: 14px;
+                font-weight: 500;
+            }
+            .group-simple-row .hint {
+                font-size: 12px;
+                color: var(--apple-text-mut);
+            }
+
+            .group-detail-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .gd-item {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .gd-item label {
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--apple-text-mut);
+            }
+            .gd-item .gd-effective {
+                font-size: 11px;
+                color: var(--sys-cyan);
+                margin-top: 2px;
+                font-weight: 500;
+            }
+
+            /* Segmented Control iOS Style */
+            .recharge-box {
+                background: var(--apple-input-bg);
+                border-radius: var(--apple-radius-lg);
+                padding: 18px;
+                margin-bottom: 12px;
+            }
+            .recharge-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 18px;
+            }
+            .recharge-title {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--apple-text-main);
+            }
+
+            .currency-toggle {
+                display: inline-flex;
+                background: rgba(118, 118, 128, 0.12);
+                padding: 2px;
+                border-radius: 8px;
+            }
+            .currency-toggle button {
+                padding: 6px 16px;
+                font-size: 13px;
+                font-weight: 600;
+                background: transparent;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                color: var(--apple-text-mut);
+                transition: all 0.2s var(--ease-apple);
+            }
+            .currency-toggle button.active {
+                background: var(--apple-bg);
+                color: var(--apple-text-main);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            }
+
+            .recharge-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .recharge-row label {
+                font-size: 14px;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+            .recharge-row input {
+                width: 100px;
+            }
+            .recharge-row .unit {
+                font-size: 14px;
+                color: var(--apple-text-mut);
+                font-weight: 500;
+            }
+
+            .derived-row {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 18px;
+                padding-top: 18px;
+                border-top: 1px solid var(--apple-divider);
+            }
+            .derived-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .derived-item .d-label {
+                font-size: 11px;
+                color: var(--apple-text-mut);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-weight: 600;
+            }
+            .derived-item .d-val {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--sys-cyan);
+                font-variant-numeric: tabular-nums;
+            }
+
+            /* Actual Rate Cards */
+            .rate-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .rate-item {
+                background: var(--apple-input-bg);
+                padding: 16px;
+                border-radius: var(--apple-radius-lg);
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                position: relative;
+                overflow: hidden;
+            }
+            .rate-item::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 4px;
+                height: 100%;
+            }
+            .rate-item.border-blue::before {
+                background: var(--sys-blue);
+            }
+            .rate-item.border-orange::before {
+                background: var(--sys-orange);
+            }
+            .rate-item.border-green::before {
+                background: var(--sys-green);
+            }
+            .rate-item.border-purple::before {
+                background: var(--sys-purple);
+            }
+
+            .rate-item .rate-label {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--apple-text-main);
+                margin-bottom: 6px;
+            }
+            .rate-item .rate-usd {
+                font-size: 16px;
+                font-weight: 700;
+                color: var(--apple-text-main);
+                font-variant-numeric: tabular-nums;
+            }
+            .rate-item .rate-cny {
+                font-size: 12px;
+                color: var(--apple-text-mut);
+                font-variant-numeric: tabular-nums;
+            }
+            .rate-item .rate-pts {
+                font-size: 12px;
+                color: var(--sys-cyan);
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+                margin-top: 2px;
+            }
+            .rate-item .rate-mult {
+                font-size: 11px;
+                color: var(--apple-text-light);
+                margin-top: 6px;
+                font-weight: 500;
+            }
+
+            /* Cost Breakdown rows */
+            .result-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--apple-divider);
+            }
+            .result-row:last-child {
+                border-bottom: none;
+            }
+            .result-label {
+                font-size: 14px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .result-vals {
+                display: flex;
+                gap: 20px;
+                align-items: baseline;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .r-usd {
+                font-weight: 700;
+                min-width: 82px;
+                text-align: right;
+                font-size: 15px;
+                color: var(--apple-text-main);
+            }
+            .r-cny {
+                color: var(--apple-text-mut);
+                font-size: 13px;
+                min-width: 62px;
+                text-align: right;
+                font-weight: 500;
+            }
+            .r-pts {
+                color: var(--sys-cyan);
+                font-size: 13px;
+                font-weight: 600;
+                min-width: 70px;
+                text-align: right;
+            }
+
+            .cols-header {
+                display: flex;
+                justify-content: flex-end;
+                gap: 20px;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--apple-text-light);
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            /* Totals */
+            .total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                padding: 20px 0 12px;
+            }
+            .total-label {
+                font-size: 18px;
+                font-weight: 700;
+            }
+            .total-vals {
+                display: flex;
+                gap: 20px;
+                align-items: baseline;
+                font-variant-numeric: tabular-nums;
+            }
+            .total-usd {
+                font-size: 28px;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+            }
+            .total-cny {
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--apple-text-mut);
+            }
+            .total-pts {
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--sys-cyan);
+            }
+
+            /* Vibrant Savings Bar */
+            .savings-bar {
+                margin-top: 24px;
+                background: var(--apple-input-bg);
+                border-radius: var(--apple-radius-lg);
+                padding: 18px;
+                position: relative;
+                overflow: hidden;
+            }
+            .savings-label {
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--apple-text-main);
+                margin-bottom: 12px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .bar-wrap {
+                height: 8px;
+                background: rgba(0, 0, 0, 0.06);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .bar-fill {
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    var(--sys-cyan),
+                    var(--sys-green)
+                );
+                border-radius: 4px;
+                transition: width 0.8s var(--ease-spring);
+            }
+            .savings-note {
+                font-size: 13px;
+                color: var(--sys-green);
+                margin-top: 10px;
+                font-variant-numeric: tabular-nums;
+                font-weight: 600;
+            }
+
+            .ex-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            .ex-row label {
+                font-size: 14px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+            .ex-row input {
+                width: 110px;
+            }
+            .ex-row .ex-note {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--apple-text-mut);
+            }
+
+            @media (max-width: 768px) {
+                .grid {
+                    grid-template-columns: 1fr;
+                }
+                .root {
+                    padding: 20px 16px;
+                }
+                .card {
+                    padding: 20px;
+                }
+                .result-vals {
+                    gap: 10px;
+                }
+                .total-vals {
+                    gap: 12px;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                }
+            }
+
+            /* ================= Price Section Topline ================= */
+            .price-sec-topline {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            .price-sec-topline .sec-title {
+                margin-bottom: 0;
+            }
+            .pick-model-btn {
+                font-size: 12px;
+                font-weight: 600;
+                padding: 6px 14px;
+                border: none;
+                border-radius: 100px;
+                background: var(--sys-blue);
+                color: #fff;
+                cursor: pointer;
+                transition: all 0.2s var(--ease-apple);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+            }
+            .pick-model-btn:hover {
+                transform: scale(1.03);
+                box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+            }
+            .pick-model-btn svg {
+                width: 13px;
+                height: 13px;
+            }
+
+            /* ================= Current Model Chip ================= */
+            .mp-current {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 6px 4px 12px;
+                background: rgba(0, 122, 255, 0.12);
+                color: var(--sys-blue);
+                border-radius: 100px;
+                font-size: 11px;
+                font-weight: 600;
+                margin-bottom: 16px;
+                max-width: 100%;
+            }
+            .mp-current .text {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 280px;
+            }
+            .mp-current-x {
+                background: transparent;
+                border: none;
+                color: var(--sys-blue);
+                cursor: pointer;
+                padding: 2px 6px;
+                font-size: 14px;
+                line-height: 1;
+                border-radius: 100px;
+                transition: all 0.2s var(--ease-apple);
+            }
+            .mp-current-x:hover {
+                background: rgba(0, 122, 255, 0.18);
+            }
+            .mp-current[hidden] {
+                display: none;
+            }
+
+            /* ================= Model Picker Dialog ================= */
+            .mp-mask {
+                position: fixed;
+                inset: 0;
+                z-index: 100;
+                background: rgba(0, 0, 0, 0.45);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s var(--ease-apple);
+            }
+            .mp-mask.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .mp-dialog {
+                width: min(92vw, 760px);
+                max-height: 86vh;
+                background: var(--apple-card);
+                border: 1px solid var(--apple-card-border);
+                border-radius: var(--apple-radius-xl);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                box-shadow: var(--apple-shadow);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                transform: scale(0.96);
+                transition: transform 0.25s var(--ease-spring);
+            }
+            .mp-mask.open .mp-dialog {
+                transform: scale(1);
+            }
+            .mp-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 16px 22px;
+                border-bottom: 1px solid var(--apple-divider);
+            }
+            .mp-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--apple-text-main);
+            }
+            .mp-updated {
+                font-size: 12px;
+                color: var(--apple-text-mut);
+            }
+            .mp-header .spacer {
+                flex: 1;
+            }
+            .mp-refresh {
+                font-size: 12px;
+                font-weight: 600;
+                padding: 6px 12px;
+                border: none;
+                border-radius: 100px;
+                background: var(--apple-input-bg);
+                color: var(--sys-blue);
+                cursor: pointer;
+                transition: all 0.2s var(--ease-apple);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .mp-refresh:hover:not(:disabled) {
+                transform: scale(1.03);
+            }
+            .mp-refresh:disabled {
+                opacity: 0.6;
+                cursor: wait;
+            }
+            .mp-spin {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border: 2px solid var(--sys-blue);
+                border-right-color: transparent;
+                border-radius: 50%;
+                animation: mp-spin 0.7s linear infinite;
+            }
+            @keyframes mp-spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .mp-close {
+                width: 28px;
+                height: 28px;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: var(--apple-text-mut);
+                font-size: 20px;
+                line-height: 1;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s var(--ease-apple);
+            }
+            .mp-close:hover {
+                background: var(--apple-input-bg);
+            }
+            .mp-search-row {
+                display: flex;
+                gap: 10px;
+                padding: 12px 22px;
+                border-bottom: 1px solid var(--apple-divider);
+            }
+            .mp-search {
+                flex: 1;
+                padding: 10px 14px;
+                font-size: 14px;
+                font-family: inherit;
+                border: 1px solid transparent;
+                border-radius: var(--apple-radius-md);
+                background: var(--apple-input-bg);
+                color: var(--apple-text-main);
+                transition: all 0.2s var(--ease-apple);
+            }
+            .mp-search:focus {
+                outline: none;
+                background: transparent;
+                border-color: var(--sys-blue);
+                box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+            }
+            .mp-filter {
+                padding: 10px 12px;
+                font-size: 14px;
+                font-family: inherit;
+                border: 1px solid transparent;
+                border-radius: var(--apple-radius-md);
+                background: var(--apple-input-bg);
+                color: var(--apple-text-main);
+                max-width: 40%;
+                cursor: pointer;
+            }
+            .mp-list {
+                flex: 1;
+                overflow-y: auto;
+                padding: 6px 12px;
+                min-height: 240px;
+            }
+            .mp-empty,
+            .mp-loading,
+            .mp-error {
+                padding: 32px 16px;
+                text-align: center;
+                font-size: 13px;
+                color: var(--apple-text-mut);
+            }
+            .mp-error {
+                color: #ff3b30;
+            }
+            .mp-error button {
+                margin-left: 8px;
+                background: none;
+                border: none;
+                color: var(--sys-blue);
+                text-decoration: underline;
+                cursor: pointer;
+                font-size: 13px;
+                font-family: inherit;
+            }
+            .mp-group {
+                margin-bottom: 6px;
+            }
+            .mp-group-title {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                padding: 6px 12px;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--apple-text-mut);
+                background: var(--apple-card);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+            }
+            .mp-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 12px;
+                margin: 2px 0;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.15s var(--ease-apple);
+                border: 1px solid transparent;
+                background: transparent;
+                width: 100%;
+                text-align: left;
+                font-family: inherit;
+            }
+            .mp-item:hover {
+                background: var(--apple-input-bg);
+            }
+            .mp-item.selected {
+                background: var(--apple-input-bg);
+                border-color: var(--sys-blue);
+                box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+            }
+            .mp-item-main {
+                flex: 1;
+                min-width: 0;
+            }
+            .mp-item-name {
+                font-size: 13px;
+                color: var(--apple-text-main);
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .mp-item-id {
+                font-size: 11px;
+                color: var(--apple-text-mut);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .mp-item-cost {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 11px;
+                color: var(--apple-text-mut);
+                font-variant-numeric: tabular-nums;
+                flex-shrink: 0;
+            }
+            .mp-badge {
+                padding: 2px 6px;
+                border-radius: 5px;
+                font-weight: 600;
+                color: #fff;
+                white-space: nowrap;
+            }
+            .mp-badge.mp-bg-green {
+                background: var(--sys-green);
+            }
+            .mp-badge.mp-bg-purple {
+                background: var(--sys-purple);
+            }
+            .mp-truncate {
+                padding: 10px 12px;
+                text-align: center;
+                font-size: 12px;
+                color: var(--apple-text-mut);
+            }
+            .mp-preview {
+                padding: 14px 22px;
+                border-top: 1px solid var(--apple-divider);
+                background: var(--apple-input-bg);
+            }
+            .mp-preview-name {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--apple-text-main);
+                margin-bottom: 8px;
+            }
+            .mp-preview-name .sub {
+                color: var(--apple-text-mut);
+                font-weight: 500;
+            }
+            .mp-preview-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                font-size: 12px;
+            }
+            .mp-preview-grid .k {
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--apple-text-mut);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+            .mp-preview-grid .v {
+                font-weight: 600;
+                color: var(--apple-text-main);
+                font-variant-numeric: tabular-nums;
+            }
+            .mp-preview-grid .v .hint {
+                color: var(--apple-text-mut);
+                font-weight: 400;
+                font-size: 10px;
+                margin-left: 2px;
+            }
+            .mp-preview-empty {
+                font-size: 12px;
+                color: var(--apple-text-mut);
+            }
+            .mp-actions {
+                padding: 14px 22px;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                border-top: 1px solid var(--apple-divider);
+            }
+            .mp-btn {
+                padding: 8px 18px;
+                border-radius: 100px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                border: none;
+                font-family: inherit;
+                transition: all 0.2s var(--ease-apple);
+            }
+            .mp-btn-cancel {
+                background: var(--apple-input-bg);
+                color: var(--apple-text-main);
+            }
+            .mp-btn-apply {
+                background: var(--sys-blue);
+                color: #fff;
+            }
+            .mp-btn-apply:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+            .mp-btn-apply:hover:not(:disabled) {
+                transform: scale(1.03);
+            }
+
+            @media (max-width: 768px) {
+                .mp-preview-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .mp-filter {
+                    max-width: 45%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Ambient Blobs -->
+        <div class="ambient-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        <div class="root">
+            <div class="grid">
+                <!-- LEFT PANEL -->
+                <div class="card">
+                    <div class="price-sec-topline">
+                        <div class="sec-title">单价配置 (USD)</div>
+                        <button
+                            type="button"
+                            class="pick-model-btn"
+                            onclick="openPicker()"
+                            title="从 models.dev 选择模型"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="M21 21l-4.35-4.35"></path>
+                            </svg>
+                            选择模型
+                        </button>
+                    </div>
+                    <div class="mp-current" id="mpCurrent" hidden>
+                        <span>当前模型：</span>
+                        <span class="text" id="mpCurrentText"></span>
+                        <button
+                            class="mp-current-x"
+                            onclick="clearCurrentModel()"
+                            title="清除当前模型标识"
+                        >×</button>
+                    </div>
+                    <div class="price-grid">
+                        <div class="price-item">
+                            <label
+                                ><span class="icon-box bg-blue">IN</span>输入 /
+                                1M</label
+                            >
+                            <div class="price-input-wrap">
+                                <input
+                                    type="number"
+                                    id="pIn"
+                                    value="5"
+                                    min="0"
+                                    step="0.01"
+                                /><span class="price-unit">$</span>
+                            </div>
+                            <div class="ref-row" id="ref-pIn"></div>
+                        </div>
+                        <div class="price-item">
+                            <label
+                                ><span class="icon-box bg-orange">OT</span>输出
+                                / 1M</label
+                            >
+                            <div class="price-input-wrap">
+                                <input
+                                    type="number"
+                                    id="pOut"
+                                    value="25"
+                                    min="0"
+                                    step="0.01"
+                                /><span class="price-unit">$</span>
+                            </div>
+                            <div class="ref-row" id="ref-pOut"></div>
+                        </div>
+                        <div class="price-item">
+                            <label
+                                ><span class="icon-box bg-green">CR</span
+                                >读取缓存 / 1M</label
+                            >
+                            <div class="price-input-wrap">
+                                <input
+                                    type="number"
+                                    id="pCR"
+                                    value="0.5"
+                                    min="0"
+                                    step="0.01"
+                                /><span class="price-unit">$</span>
+                            </div>
+                            <div class="ref-row" id="ref-pCR"></div>
+                        </div>
+                        <div class="price-item">
+                            <label
+                                ><span class="icon-box bg-purple">CW</span
+                                >写入缓存 / 1M</label
+                            >
+                            <div class="price-input-wrap">
+                                <input
+                                    type="number"
+                                    id="pCC"
+                                    value="6.25"
+                                    min="0"
+                                    step="0.01"
+                                /><span class="price-unit">$</span>
+                            </div>
+                            <div class="ref-row" id="ref-pCC"></div>
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <div class="ex-row">
+                        <label>汇率 1 USD =</label>
+                        <input
+                            type="number"
+                            id="exRate"
+                            value="7.25"
+                            min="0.01"
+                            step="0.01"
+                        />
+                        <span class="ex-note">CNY</span>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <!-- 分组倍率 -->
+                    <div class="group-rate-box">
+                        <div class="group-rate-header">
+                            <span class="group-rate-header-left"
+                                >API 分组倍率</span
+                            >
+                            <button
+                                class="toggle-detail-btn"
+                                id="detailToggleBtn"
+                                onclick="toggleDetail()"
+                            >
+                                <span id="detailBtnIcon">展开</span> 详细模式
+                            </button>
+                        </div>
+
+                        <div
+                            class="group-anim-wrap group-simple-wrap"
+                            id="groupSimpleWrap"
+                        >
+                            <div class="anim-inner">
+                                <div class="group-simple" id="groupSimple">
+                                    <div class="group-simple-row">
+                                        <label>统一倍率</label>
+                                        <input
+                                            type="number"
+                                            id="groupRate"
+                                            value="1"
+                                            min="0"
+                                            step="0.01"
+                                        />
+                                        <span class="hint">所有类型共用</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="group-anim-wrap group-detail-wrap"
+                            id="groupDetailWrap"
+                        >
+                            <div class="anim-inner">
+                                <div class="group-detail" id="groupDetail">
+                                    <div class="group-detail-grid">
+                                        <div class="gd-item">
+                                            <label>输入倍率</label
+                                            ><input
+                                                type="number"
+                                                id="grIn"
+                                                value="1"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                            <div
+                                                class="gd-effective"
+                                                id="ge-in"
+                                            ></div>
+                                        </div>
+                                        <div class="gd-item">
+                                            <label>输出倍率</label
+                                            ><input
+                                                type="number"
+                                                id="grOut"
+                                                value="1"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                            <div
+                                                class="gd-effective"
+                                                id="ge-out"
+                                            ></div>
+                                        </div>
+                                        <div class="gd-item">
+                                            <label>读取倍率</label
+                                            ><input
+                                                type="number"
+                                                id="grCR"
+                                                value="1"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                            <div
+                                                class="gd-effective"
+                                                id="ge-cr"
+                                            ></div>
+                                        </div>
+                                        <div class="gd-item">
+                                            <label>写入倍率</label
+                                            ><input
+                                                type="number"
+                                                id="grCC"
+                                                value="1"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                            <div
+                                                class="gd-effective"
+                                                id="ge-cc"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 充值换算 -->
+                    <div class="recharge-box">
+                        <div class="recharge-header">
+                            <span class="recharge-title">中转平台积分比例</span>
+                            <div
+                                class="currency-toggle"
+                                id="rechargeCurrencyToggle"
+                            >
+                                <button class="active" onclick="setRC('CNY')">
+                                    ¥ CNY
+                                </button>
+                                <button onclick="setRC('USD')">$ USD</button>
+                            </div>
+                        </div>
+                        <div class="recharge-row">
+                            <label>充值</label>
+                            <input
+                                type="number"
+                                id="rechargeAmount"
+                                value="10"
+                                min="0.01"
+                                step="0.01"
+                            />
+                            <span class="unit" id="rechargeUnit">CNY</span>
+                            <label
+                                style="
+                                    margin-left: 8px;
+                                    color: var(--apple-text-mut);
+                                "
+                                >得</label
+                            >
+                            <input
+                                type="number"
+                                id="rechargePoints"
+                                value="1000"
+                                min="1"
+                                step="1"
+                            />
+                            <span class="unit">积分</span>
+                        </div>
+                        <div class="derived-row">
+                            <div class="derived-item">
+                                <span class="d-label">1 积分 =</span
+                                ><span class="d-val" id="d-perPoint">-</span>
+                            </div>
+                            <div class="derived-item">
+                                <span class="d-label">1 CNY =</span
+                                ><span class="d-val" id="d-perCny">-</span>
+                            </div>
+                            <div class="derived-item">
+                                <span class="d-label">1 USD =</span
+                                ><span class="d-val" id="d-perUsd">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+                    <div class="sec-title">实际计算单价</div>
+                    <div class="rate-grid" id="rateDisplay"></div>
+                </div>
+
+                <!-- RIGHT PANEL -->
+                <div class="card" style="display: flex; flex-direction: column">
+                    <div class="sec-title">实际消耗 Token 测试</div>
+                    <div class="field">
+                        <label
+                            ><span class="icon-box bg-blue">IN</span>输入 (Input
+                            Tokens)</label
+                        ><input
+                            type="number"
+                            id="tokIn"
+                            value="37"
+                            min="0"
+                            step="1"
+                        />
+                    </div>
+                    <div class="field">
+                        <label
+                            ><span class="icon-box bg-orange">OT</span>输出
+                            (Output Tokens)</label
+                        ><input
+                            type="number"
+                            id="tokOut"
+                            value="916"
+                            min="0"
+                            step="1"
+                        />
+                    </div>
+                    <div class="field">
+                        <label
+                            ><span class="icon-box bg-green">CR</span>缓存读取
+                            (Cache Read)</label
+                        ><input
+                            type="number"
+                            id="tokCR"
+                            value="72801"
+                            min="0"
+                            step="1"
+                        />
+                    </div>
+                    <div class="field">
+                        <label
+                            ><span class="icon-box bg-purple">CW</span>缓存写入
+                            (Cache Write)</label
+                        ><input
+                            type="number"
+                            id="tokCC"
+                            value="1368"
+                            min="0"
+                            step="1"
+                        />
+                    </div>
+
+                    <hr class="divider" />
+
+                    <div class="sec-title">费用账单明细</div>
+                    <div class="cols-header">
+                        <span style="min-width: 82px">USD $</span>
+                        <span style="min-width: 62px">CNY ¥</span>
+                        <span style="min-width: 70px">积分</span>
+                    </div>
+                    <div>
+                        <div class="result-row">
+                            <span class="result-label"
+                                ><span class="icon-box bg-blue">IN</span>
+                                输入</span
+                            >
+                            <div class="result-vals">
+                                <span class="r-usd" id="c-in">-</span
+                                ><span class="r-cny" id="cr-in">-</span
+                                ><span class="r-pts" id="cp-in">-</span>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label"
+                                ><span class="icon-box bg-orange">OT</span>
+                                输出</span
+                            >
+                            <div class="result-vals">
+                                <span class="r-usd" id="c-out">-</span
+                                ><span class="r-cny" id="cr-out">-</span
+                                ><span class="r-pts" id="cp-out">-</span>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label"
+                                ><span class="icon-box bg-green">CR</span>
+                                读取</span
+                            >
+                            <div class="result-vals">
+                                <span class="r-usd" id="c-cr">-</span
+                                ><span class="r-cny" id="cr-cr">-</span
+                                ><span class="r-pts" id="cp-cr">-</span>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label"
+                                ><span class="icon-box bg-purple">CW</span>
+                                写入</span
+                            >
+                            <div class="result-vals">
+                                <span class="r-usd" id="c-cc">-</span
+                                ><span class="r-cny" id="cr-cc">-</span
+                                ><span class="r-pts" id="cp-cc">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="flex-grow: 1"></div>
+
+                    <hr class="divider" />
+                    <div class="total-row">
+                        <span class="total-label">总计估算</span>
+                        <div class="total-vals">
+                            <span class="total-usd" id="total-usd">-</span>
+                            <span class="total-cny" id="total-cny">-</span>
+                            <span class="total-pts" id="total-pts">-</span>
+                        </div>
+                    </div>
+
+                    <div class="savings-bar">
+                        <div class="savings-label">
+                            <span>命中缓存为您节省</span
+                            ><span
+                                id="savings-percent"
+                                style="color: var(--sys-green)"
+                                >-</span
+                            >
+                        </div>
+                        <div class="bar-wrap">
+                            <div
+                                class="bar-fill"
+                                id="savings-bar"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div class="savings-note" id="savings-note">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Picker Dialog -->
+        <div class="mp-mask" id="mpMask" onclick="maskClick(event)">
+            <div class="mp-dialog" id="mpDialog" onclick="event.stopPropagation()">
+                <div class="mp-header">
+                    <div class="mp-title">选择模型</div>
+                    <span class="mp-updated" id="mpUpdated"></span>
+                    <div class="spacer"></div>
+                    <button
+                        class="mp-refresh"
+                        id="mpRefresh"
+                        onclick="refreshCatalog()"
+                        title="强制从 models.dev 重新拉取"
+                    >
+                        <span id="mpRefreshSpin"></span>
+                        <span id="mpRefreshText">刷新目录</span>
+                    </button>
+                    <button
+                        class="mp-close"
+                        onclick="closePicker()"
+                        title="关闭"
+                    >×</button>
+                </div>
+                <div class="mp-search-row">
+                    <input
+                        type="text"
+                        class="mp-search"
+                        id="mpSearch"
+                        placeholder="搜索模型或厂商..."
+                        oninput="onSearch()"
+                        autocomplete="off"
+                    />
+                    <select
+                        class="mp-filter"
+                        id="mpFilter"
+                        onchange="renderList()"
+                    >
+                        <option value="">全部厂商</option>
+                    </select>
+                </div>
+                <div class="mp-list" id="mpList"></div>
+                <div class="mp-preview" id="mpPreview">
+                    <div class="mp-preview-empty">
+                        未选中模型 · 未提供的字段将保留当前值
+                    </div>
+                </div>
+                <div class="mp-actions">
+                    <button
+                        class="mp-btn mp-btn-cancel"
+                        onclick="closePicker()"
+                    >取消</button>
+                    <button
+                        class="mp-btn mp-btn-apply"
+                        id="mpApply"
+                        disabled
+                        onclick="applyModel()"
+                    >应用</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let detailMode = false;
+            let rechargeCurrency = "CNY";
+
+            function toggleDetail() {
+                detailMode = !detailMode;
+                const wrapSimple = document.getElementById("groupSimpleWrap");
+                const wrapDetail = document.getElementById("groupDetailWrap");
+
+                if (detailMode) {
+                    wrapSimple.classList.add("hidden");
+                    wrapDetail.classList.add("visible");
+                } else {
+                    wrapSimple.classList.remove("hidden");
+                    wrapDetail.classList.remove("visible");
+                }
+
+                const btn = document.getElementById("detailToggleBtn");
+                btn.classList.toggle("on", detailMode);
+                document.getElementById("detailBtnIcon").textContent =
+                    detailMode ? "收起" : "展开";
+
+                if (detailMode) {
+                    const g = v("groupRate");
+                    ["grIn", "grOut", "grCR", "grCC"].forEach(
+                        (id) => (document.getElementById(id).value = g),
+                    );
+                }
+                calc();
+            }
+
+            function setRC(c) {
+                rechargeCurrency = c;
+                document
+                    .querySelectorAll("#rechargeCurrencyToggle button")
+                    .forEach((b, i) => {
+                        b.classList.toggle(
+                            "active",
+                            (i === 0 && c === "CNY") ||
+                                (i === 1 && c === "USD"),
+                        );
+                    });
+                calc();
+            }
+
+            function v(id) {
+                return parseFloat(document.getElementById(id).value) || 0;
+            }
+            function s(id, t) {
+                document.getElementById(id).textContent = t;
+            }
+            function fU(n) {
+                return "$" + n.toFixed(6);
+            }
+            function fC(n) {
+                return "¥" + n.toFixed(6);
+            }
+            function fP(n) {
+                return n.toFixed(2) + " 积分";
+            }
+
+            function getMultipliers() {
+                return detailMode
+                    ? [v("grIn"), v("grOut"), v("grCR"), v("grCC")]
+                    : Array(4).fill(v("groupRate") || 1);
+            }
+
+            function calc() {
+                const exRate = v("exRate") || 7.25;
+                const rawUsd = [v("pIn"), v("pOut"), v("pCR"), v("pCC")];
+                const mults = getMultipliers();
+                const usdPrices = rawUsd.map((p, i) => p * mults[i]);
+                const cnyPrices = usdPrices.map((p) => p * exRate);
+
+                ["pIn", "pOut", "pCR", "pCC"].forEach((id, i) => {
+                    s(
+                        "ref-" + id,
+                        "≈ ¥" + (rawUsd[i] * exRate).toFixed(4) + " / 1M",
+                    );
+                });
+
+                if (detailMode) {
+                    const geIds = ["ge-in", "ge-out", "ge-cr", "ge-cc"];
+                    rawUsd.forEach((p, i) =>
+                        s(
+                            geIds[i],
+                            "实际 $" + (p * mults[i]).toFixed(4) + " / 1M",
+                        ),
+                    );
+                }
+
+                const rechargeAmt = v("rechargeAmount") || 10;
+                const rechargePts = v("rechargePoints") || 1000;
+                s("rechargeUnit", rechargeCurrency);
+                const rechargeUsd =
+                    rechargeCurrency === "USD"
+                        ? rechargeAmt
+                        : rechargeAmt / exRate;
+                const rechargeCny = rechargeUsd * exRate;
+                const ptsPerUsd = rechargePts / rechargeUsd;
+                const ptsPerCny = rechargePts / rechargeCny;
+                const cnyPerPt = rechargeCny / rechargePts;
+                s(
+                    "d-perPoint",
+                    "¥" +
+                        cnyPerPt.toFixed(4) +
+                        " / $" +
+                        (cnyPerPt / exRate).toFixed(4),
+                );
+                s("d-perCny", ptsPerCny.toFixed(2) + " 积分");
+                s("d-perUsd", ptsPerUsd.toFixed(2) + " 积分");
+
+                const typeLabels = ["输入", "输出", "读取", "写入"];
+                const borderColors = [
+                    "border-blue",
+                    "border-orange",
+                    "border-green",
+                    "border-purple",
+                ];
+                let html = "";
+                usdPrices.forEach((up, i) => {
+                    const cp = cnyPrices[i],
+                        pp = up * ptsPerUsd;
+                    const multLabel = detailMode
+                        ? `× ${mults[i].toFixed(2)} 独立倍率`
+                        : `× ${mults[i].toFixed(2)} 统一倍率`;
+                    html += `<div class="rate-item ${borderColors[i]}">
+        <div class="rate-label">${typeLabels[i]}单价</div>
+        <div class="rate-usd">$${up.toFixed(4)} <span style="font-size:12px; font-weight:500; color:var(--apple-text-mut)">/ 1M</span></div>
+        <div class="rate-cny">¥${cp.toFixed(4)} / 1M</div>
+        <div class="rate-pts">${Math.round(pp)} 积分 / 1M</div>
+        <div class="rate-mult">${multLabel}</div>
+      </div>`;
+                });
+                document.getElementById("rateDisplay").innerHTML = html;
+
+                const toks = [v("tokIn"), v("tokOut"), v("tokCR"), v("tokCC")];
+                const sfx = ["in", "out", "cr", "cc"];
+                let totalUsd = 0;
+                toks.forEach((tok, i) => {
+                    const costUsd = (tok / 1e6) * usdPrices[i];
+                    const costCny = costUsd * exRate;
+                    const costPts = costUsd * ptsPerUsd;
+                    totalUsd += costUsd;
+                    s("c-" + sfx[i], fU(costUsd));
+                    s("cr-" + sfx[i], fC(costCny));
+                    s("cp-" + sfx[i], fP(costPts));
+                });
+
+                const totalCny = totalUsd * exRate,
+                    totalPts = totalUsd * ptsPerUsd;
+                s("total-usd", fU(totalUsd));
+                s("total-cny", fC(totalCny));
+                s("total-pts", fP(totalPts));
+
+                const savedUsd =
+                    (toks[2] / 1e6) * (usdPrices[0] - usdPrices[2]);
+                const woCache = totalUsd + savedUsd;
+                const savePct =
+                    woCache > 0 ? Math.min(100, (savedUsd / woCache) * 100) : 0;
+
+                document.getElementById("savings-bar").style.width =
+                    savePct.toFixed(1) + "%";
+                s("savings-percent", savePct.toFixed(1) + "%");
+                s(
+                    "savings-note",
+                    savePct > 0
+                        ? "由于启用了 Context Caching，共节省了 " +
+                              fU(savedUsd) +
+                              " (约 " +
+                              fC(savedUsd * exRate) +
+                              ")"
+                        : "当前无缓存读取，未产生节省费用",
+                );
+            }
+
+            /* ================= Model Picker Logic ================= */
+            const MP_URL = "https://models.dev/api.json";
+            const MP_CACHE_KEY = "tokenrate.modelCatalog.v1";
+            const MP_CURRENT_KEY = "tokenrate.currentModel.v1";
+            const MP_TTL_MS = 60 * 60 * 1000;
+
+            let mpModels = [];
+            let mpFetchedAt = null;
+            let mpLoading = false;
+            let mpError = null;
+            let mpSelected = null;
+            let mpSearchTimer = null;
+            let mpCurrentModel = null;
+
+            function mpReadCache() {
+                try {
+                    const raw = localStorage.getItem(MP_CACHE_KEY);
+                    if (!raw) return null;
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || !parsed.providers || !parsed.fetchedAt)
+                        return null;
+                    return parsed;
+                } catch {
+                    return null;
+                }
+            }
+
+            function mpWriteCache(providers, fetchedAt) {
+                try {
+                    localStorage.setItem(
+                        MP_CACHE_KEY,
+                        JSON.stringify({ fetchedAt, providers }),
+                    );
+                } catch (err) {
+                    console.warn("[mp] localStorage write failed:", err);
+                }
+            }
+
+            function mpNormalize(raw) {
+                const list = [];
+                for (const pid in raw) {
+                    const p = raw[pid];
+                    if (!p || !p.models) continue;
+                    const pname = p.name || pid;
+                    for (const mid in p.models) {
+                        const m = p.models[mid];
+                        if (!m) continue;
+                        const cost = m.cost || {};
+                        if (
+                            cost.input == null &&
+                            cost.output == null &&
+                            cost.cache_read == null &&
+                            cost.cache_write == null
+                        )
+                            continue;
+                        const mname = m.name || mid;
+                        list.push({
+                            providerId: pid,
+                            providerName: pname,
+                            modelId: mid,
+                            modelName: mname,
+                            cost: {
+                                input: cost.input,
+                                output: cost.output,
+                                cacheRead: cost.cache_read,
+                                cacheWrite: cost.cache_write,
+                            },
+                            searchKey: (
+                                pname +
+                                " " +
+                                pid +
+                                " " +
+                                mname +
+                                " " +
+                                mid
+                            ).toLowerCase(),
+                        });
+                    }
+                }
+                list.sort((a, b) => {
+                    const d = a.providerName.localeCompare(b.providerName);
+                    return d !== 0
+                        ? d
+                        : a.modelName.localeCompare(b.modelName);
+                });
+                return list;
+            }
+
+            async function mpLoadCatalog(force) {
+                if (mpLoading) return;
+                mpLoading = true;
+                mpError = null;
+                mpUpdateUI();
+                try {
+                    if (!force) {
+                        const cached = mpReadCache();
+                        if (
+                            cached &&
+                            Date.now() - cached.fetchedAt < MP_TTL_MS
+                        ) {
+                            mpModels = mpNormalize(cached.providers);
+                            mpFetchedAt = cached.fetchedAt;
+                            return;
+                        }
+                    }
+                    const res = await fetch(MP_URL, {
+                        headers: { accept: "application/json" },
+                    });
+                    if (!res.ok)
+                        throw new Error(
+                            "models.dev 请求失败 (" + res.status + ")",
+                        );
+                    const providers = await res.json();
+                    mpFetchedAt = Date.now();
+                    mpModels = mpNormalize(providers);
+                    mpWriteCache(providers, mpFetchedAt);
+                } catch (err) {
+                    mpError =
+                        err instanceof Error ? err.message : String(err);
+                } finally {
+                    mpLoading = false;
+                    mpRebuildProviderFilter();
+                    mpUpdateUI();
+                }
+            }
+
+            function mpRebuildProviderFilter() {
+                const sel = document.getElementById("mpFilter");
+                const cur = sel.value;
+                const map = new Map();
+                for (const m of mpModels) {
+                    if (!map.has(m.providerId))
+                        map.set(m.providerId, m.providerName);
+                }
+                const opts = [...map.entries()].sort((a, b) =>
+                    a[1].localeCompare(b[1]),
+                );
+                sel.innerHTML =
+                    '<option value="">全部厂商</option>' +
+                    opts
+                        .map(
+                            ([id, name]) =>
+                                '<option value="' +
+                                mpEscape(id) +
+                                '">' +
+                                mpEscape(name) +
+                                "</option>",
+                        )
+                        .join("");
+                sel.value = opts.some(([id]) => id === cur) ? cur : "";
+            }
+
+            function mpFilterModels() {
+                const kw = document
+                    .getElementById("mpSearch")
+                    .value.trim()
+                    .toLowerCase();
+                const pid = document.getElementById("mpFilter").value;
+                let list = mpModels;
+                if (pid) list = list.filter((m) => m.providerId === pid);
+                if (kw) list = list.filter((m) => m.searchKey.includes(kw));
+                return { full: list, shown: list.slice(0, 200) };
+            }
+
+            function mpFormatPrice(v) {
+                if (v == null) return "—";
+                return "$" + (v < 1 ? v.toFixed(4) : v.toFixed(2));
+            }
+
+            function mpEscape(s) {
+                return String(s).replace(
+                    /[&<>"']/g,
+                    (c) =>
+                        ({
+                            "&": "&amp;",
+                            "<": "&lt;",
+                            ">": "&gt;",
+                            '"': "&quot;",
+                            "'": "&#39;",
+                        })[c],
+                );
+            }
+
+            function renderList() {
+                const box = document.getElementById("mpList");
+                if (mpLoading && mpModels.length === 0) {
+                    box.innerHTML =
+                        '<div class="mp-loading">正在加载目录...</div>';
+                    return;
+                }
+                if (mpError) {
+                    box.innerHTML =
+                        '<div class="mp-error">' +
+                        mpEscape(mpError) +
+                        '<button onclick="refreshCatalog()">重试</button></div>';
+                    return;
+                }
+                const { full, shown } = mpFilterModels();
+                if (shown.length === 0) {
+                    box.innerHTML =
+                        '<div class="mp-empty">未找到匹配的模型</div>';
+                    return;
+                }
+                let html = "";
+                let lastPid = "";
+                for (const m of shown) {
+                    if (m.providerId !== lastPid) {
+                        if (lastPid) html += "</div>";
+                        html +=
+                            '<div class="mp-group"><div class="mp-group-title">' +
+                            mpEscape(m.providerName) +
+                            "</div>";
+                        lastPid = m.providerId;
+                    }
+                    const key = m.providerId + "::" + m.modelId;
+                    const selCls =
+                        mpSelected &&
+                        mpSelected.providerId + "::" + mpSelected.modelId ===
+                            key
+                            ? " selected"
+                            : "";
+                    let costs =
+                        "<span>IN " +
+                        mpFormatPrice(m.cost.input) +
+                        "</span><span>OUT " +
+                        mpFormatPrice(m.cost.output) +
+                        "</span>";
+                    if (m.cost.cacheRead != null)
+                        costs +=
+                            '<span class="mp-badge mp-bg-green">CR ' +
+                            mpFormatPrice(m.cost.cacheRead) +
+                            "</span>";
+                    if (m.cost.cacheWrite != null)
+                        costs +=
+                            '<span class="mp-badge mp-bg-purple">CW ' +
+                            mpFormatPrice(m.cost.cacheWrite) +
+                            "</span>";
+                    html +=
+                        '<button type="button" class="mp-item' +
+                        selCls +
+                        '" data-key="' +
+                        mpEscape(key) +
+                        '">' +
+                        '<div class="mp-item-main">' +
+                        '<div class="mp-item-name">' +
+                        mpEscape(m.modelName) +
+                        "</div>" +
+                        '<div class="mp-item-id">' +
+                        mpEscape(m.modelId) +
+                        "</div>" +
+                        "</div>" +
+                        '<div class="mp-item-cost">' +
+                        costs +
+                        "</div>" +
+                        "</button>";
+                }
+                if (lastPid) html += "</div>";
+                if (full.length > shown.length) {
+                    html +=
+                        '<div class="mp-truncate">结果过多，仅显示前 200 条，请输入关键词缩小范围</div>';
+                }
+                box.innerHTML = html;
+                box.querySelectorAll(".mp-item").forEach((el) => {
+                    el.addEventListener("click", () => {
+                        const key = el.getAttribute("data-key");
+                        const found = mpModels.find(
+                            (m) => m.providerId + "::" + m.modelId === key,
+                        );
+                        if (!found) return;
+                        mpSelected = found;
+                        mpUpdatePreview();
+                        box.querySelectorAll(".mp-item").forEach((x) =>
+                            x.classList.remove("selected"),
+                        );
+                        el.classList.add("selected");
+                    });
+                    el.addEventListener("dblclick", () => {
+                        const key = el.getAttribute("data-key");
+                        const found = mpModels.find(
+                            (m) => m.providerId + "::" + m.modelId === key,
+                        );
+                        if (!found) return;
+                        mpSelected = found;
+                        applyModel();
+                    });
+                });
+            }
+
+            function mpUpdatePreview() {
+                const box = document.getElementById("mpPreview");
+                const applyBtn = document.getElementById("mpApply");
+                if (!mpSelected) {
+                    box.innerHTML =
+                        '<div class="mp-preview-empty">未选中模型 · 未提供的字段将保留当前值</div>';
+                    applyBtn.disabled = true;
+                    return;
+                }
+                const cost = mpSelected.cost;
+                const fill = (v, label) => {
+                    if (v == null)
+                        return (
+                            '<div><div class="k">' +
+                            label +
+                            '</div><div class="v">—<span class="hint">(保留当前值)</span></div></div>'
+                        );
+                    return (
+                        '<div><div class="k">' +
+                        label +
+                        '</div><div class="v">' +
+                        mpFormatPrice(v) +
+                        "</div></div>"
+                    );
+                };
+                box.innerHTML =
+                    '<div class="mp-preview-name">' +
+                    mpEscape(mpSelected.modelName) +
+                    ' <span class="sub">· ' +
+                    mpEscape(mpSelected.providerName) +
+                    "</span></div>" +
+                    '<div class="mp-preview-grid">' +
+                    fill(cost.input, "输入") +
+                    fill(cost.output, "输出") +
+                    fill(cost.cacheRead, "缓存读") +
+                    fill(cost.cacheWrite, "缓存写") +
+                    "</div>";
+                applyBtn.disabled = false;
+            }
+
+            function mpUpdateUI() {
+                const refresh = document.getElementById("mpRefresh");
+                const refreshText = document.getElementById("mpRefreshText");
+                const refreshSpin = document.getElementById("mpRefreshSpin");
+                const updated = document.getElementById("mpUpdated");
+                refresh.disabled = mpLoading;
+                refreshText.textContent = mpLoading ? "更新中" : "刷新目录";
+                refreshSpin.innerHTML = mpLoading
+                    ? '<span class="mp-spin"></span>'
+                    : "";
+                updated.textContent = mpFetchedAt
+                    ? "已更新 " + mpRelative(mpFetchedAt)
+                    : "";
+                renderList();
+            }
+
+            function mpRelative(ts) {
+                const diff = Date.now() - ts;
+                if (diff < 60000) return "刚刚";
+                if (diff < 3600000)
+                    return Math.floor(diff / 60000) + " 分钟前";
+                if (diff < 86400000)
+                    return Math.floor(diff / 3600000) + " 小时前";
+                return Math.floor(diff / 86400000) + " 天前";
+            }
+
+            function openPicker() {
+                document.getElementById("mpMask").classList.add("open");
+                document.body.style.overflow = "hidden";
+                mpUpdateUI();
+                mpLoadCatalog(false);
+            }
+
+            function closePicker() {
+                document.getElementById("mpMask").classList.remove("open");
+                document.body.style.overflow = "";
+                document.getElementById("mpSearch").value = "";
+                document.getElementById("mpFilter").value = "";
+                mpSelected = null;
+                mpUpdatePreview();
+            }
+
+            function refreshCatalog() {
+                mpLoadCatalog(true);
+            }
+
+            function onSearch() {
+                clearTimeout(mpSearchTimer);
+                mpSearchTimer = setTimeout(renderList, 220);
+            }
+
+            function maskClick(e) {
+                if (e.target.id === "mpMask") closePicker();
+            }
+
+            function applyModel() {
+                if (!mpSelected) return;
+                const cost = mpSelected.cost;
+                const assign = (id, val) => {
+                    if (val == null) return;
+                    const input = document.getElementById(id);
+                    if (input) input.value = val;
+                };
+                assign("pIn", cost.input);
+                assign("pOut", cost.output);
+                assign("pCR", cost.cacheRead);
+                assign("pCC", cost.cacheWrite);
+                mpCurrentModel = {
+                    modelName: mpSelected.modelName,
+                    providerName: mpSelected.providerName,
+                };
+                try {
+                    localStorage.setItem(
+                        MP_CURRENT_KEY,
+                        JSON.stringify(mpCurrentModel),
+                    );
+                } catch (err) {
+                    console.warn("[mp] save current failed", err);
+                }
+                mpRenderCurrent();
+                calc();
+                closePicker();
+            }
+
+            function mpRenderCurrent() {
+                const box = document.getElementById("mpCurrent");
+                const text = document.getElementById("mpCurrentText");
+                if (!box || !text) return;
+                if (!mpCurrentModel) {
+                    box.hidden = true;
+                    return;
+                }
+                text.textContent =
+                    mpCurrentModel.modelName +
+                    " · " +
+                    mpCurrentModel.providerName;
+                box.hidden = false;
+            }
+
+            function clearCurrentModel() {
+                mpCurrentModel = null;
+                try {
+                    localStorage.removeItem(MP_CURRENT_KEY);
+                } catch {}
+                mpRenderCurrent();
+            }
+
+            try {
+                const savedCur = localStorage.getItem(MP_CURRENT_KEY);
+                if (savedCur) mpCurrentModel = JSON.parse(savedCur);
+            } catch {}
+            mpRenderCurrent();
+
+            document.addEventListener("keydown", (e) => {
+                if (
+                    e.key === "Escape" &&
+                    document
+                        .getElementById("mpMask")
+                        .classList.contains("open")
+                ) {
+                    closePicker();
+                }
+            });
+
+            [
+                "pIn",
+                "pOut",
+                "pCR",
+                "pCC",
+                "exRate",
+                "groupRate",
+                "grIn",
+                "grOut",
+                "grCR",
+                "grCC",
+                "rechargeAmount",
+                "rechargePoints",
+                "tokIn",
+                "tokOut",
+                "tokCR",
+                "tokCC",
+            ].forEach((id) =>
+                document.getElementById(id).addEventListener("input", calc),
+            );
+            calc();
+        </script>
+    </body>
+</html>
