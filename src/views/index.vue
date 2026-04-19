@@ -8,7 +8,7 @@
 </route>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import CalculatorLeftPanel from './components/CalculatorLeftPanel.vue';
 import CalculatorRightPanel from './components/CalculatorRightPanel.vue';
 import './components/calculator-page.css';
@@ -144,6 +144,29 @@ function applyModel(model: CatalogModel) {
 function clearCurrentModel() {
   currentModel.value = null;
 }
+
+/**
+ * 初始化时拉取一次 USD -> CNY 汇率，失败则沿用默认值。
+ * 主源 gcore.jsdelivr.net           — Gcore 国内节点，速度最好
+ * 备源 latest.currency-api.pages.dev — Cloudflare Pages，国内相对可访问
+ * 备源 testingcf.jsdelivr.net        — 备用
+ * 数据来源 @fawazahmed0/currency-api（GitHub 开源，每日更新）
+ */
+onMounted(async () => {
+  try {
+    const res = await fetch(
+      'https://gcore.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json'
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    const rate = data?.usd?.cny;
+    if (typeof rate === 'number' && rate > 0) {
+      form.exRate = Number(rate.toFixed(4));
+    }
+  } catch (err) {
+    console.warn('[fx] 汇率获取失败，使用默认值', err);
+  }
+});
 
 const exchangeRate = computed(() => form.exRate || 7.25);
 
